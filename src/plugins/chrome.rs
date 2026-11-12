@@ -51,6 +51,7 @@ pub fn cookies() -> Result<Ident> {
     })
 }
 
+#[allow(clippy::redundant_field_names)]
 #[derive(QueryableByName)]
 struct CookieRow {
     #[diesel(sql_type = sql_types::Text)]

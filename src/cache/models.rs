@@ -161,12 +161,25 @@ pub struct Question {
 }
 
 impl Question {
-    pub fn desc(&self) -> String {
+    /// Rendered statement body. Prefers the localized text, falls back to the
+    /// original one when the translation is missing or renders empty.
+    fn body(&self) -> String {
+        if !self.t_content.is_empty() {
+            let localized = self.t_content.render();
+            if !localized.trim().is_empty() {
+                return localized;
+            }
+        }
+
         self.content.render()
     }
 
+    pub fn desc(&self) -> String {
+        self.body()
+    }
+
     pub fn desc_comment(&self, conf: &Config) -> String {
-        let desc = self.content.render();
+        let desc = self.body();
 
         let mut res = desc.lines().fold("\n".to_string(), |acc, e| {
             acc + "" + conf.code.comment_leading.as_str() + " " + e + "\n"

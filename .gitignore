@@ -4,3 +4,5 @@
 .idea
 .direnv/
 /result
+curltest.txt
+fix.md
