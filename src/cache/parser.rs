@@ -14,13 +14,11 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
         let fid = match fid_obj.as_i64() {
             // Handle on leetcode-com
             Some(s) => s as i32,
-            // Handle on leetcode-cn
-            None => fid_obj
-                .as_str()?
-                .split(' ')
-                .next_back()?
-                .parse::<i32>()
-                .ok()?,
+            // Handle on leetcode-cn (id may come as a string)
+            None => match fid_obj.as_str().and_then(|s| s.parse::<i32>().ok()) {
+                Some(s) => s,
+                None => continue,
+            },
         };
 
         problems.push(Problem {
@@ -30,7 +28,11 @@ pub fn problem(problems: &mut Vec<Problem>, v: Value) -> Option<()> {
             level: p.get("difficulty")?.as_object()?.get("level")?.as_i64()? as i32,
             locked: p.get("paid_only")?.as_bool()?,
             name: stat.get("question__title")?.as_str()?.to_string(),
-            percent: total_acs / total_submitted * 100.0,
+            percent: if total_submitted > 0.0 {
+                total_acs / total_submitted * 100.0
+            } else {
+                0.0
+            },
             slug: stat.get("question__title_slug")?.as_str()?.to_string(),
             starred: p.get("is_favor")?.as_bool()?,
             status: p.get("status")?.as_str().unwrap_or("Null").to_string(),
